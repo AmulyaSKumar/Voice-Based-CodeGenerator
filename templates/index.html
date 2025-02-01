@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Based Code Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* General Styles */
+        :root {
+            --primary-color: #9a7bff;
+            --secondary-color: #7c5cf7;
+            --background-color: #f0e6ff;
+            --text-color: #333;
+            --accent-color: #e6d4f7;
+            --soft-purple: #d1c1f0;
+            --light-purple: #e8e0ff;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            color: var(--text-color);
+        }
+
+        /* Header Styles */
+        .header {
+            background: transparent;
+            color: #7765bf;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-icons i {
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .header-icons i:hover {
+            transform: scale(1.1);
+        }
+
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(360deg, var(--background-color) 0%, var(--accent-color) 100%);
+            color: var(--text-color);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Styling for headings inside the popup */
+        .popup h2 {
+            margin-top: 0;
+            color: #7765bf;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        /* Styling for popup content */
+        .popup p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Close button adjustments */
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 22px;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+
+        .popup-close:hover {
+            color: #000;
+        }
+
+        /* Overlay to blur background when popup is open */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 999;
+        }
+
+        /* Improve list styling inside popup */
+        .popup ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .popup ul li {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 8px;
+        }
+
+
+        /* Container Styles */
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 2%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .left-part {
+            width: 30%;
+        }
+
+        .right-part {
+            width: 66%;
+        }
+
+        /* Input Section Styles */
+        .input-section {
+            background: transparent;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 123, 255, 0.15);
+            height: fit-content;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .parameters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        textarea,
+        select,
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 3px solid #f1f3f4;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            background: transparent;
+        }
+
+        textarea:focus,
+        select:focus,
+        input:focus {
+            border-color: #2196f3;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.15);
+        }
+
+        textarea {
+            min-height: 90px;
+            line-height: 1.6;
+        }
+
+        button {
+            background: #7765bf;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+        /* Editor Styles */
+        .editor-wrapper {
+            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(220, 222, 224, 0.1);
+            height: calc(100vh - 200px);
+            backdrop-filter: blur(10px);
+        }
+
+        .editor-toolbar {
+            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            padding: 15px;
+            border-bottom: 1px solid rgba(33, 150, 243, 0.1);
+        }
+
+        .CodeMirror {
+            height: calc(100% - 60px) !important;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+        }
+
+        /* Loading and Error Styles */
+        .loading {
+            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            color: #7765bf;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .loading::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 3px solid #7765bf;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            background: linear-gradient(to right, #ffebee, #ffcdd2);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            color: #c62828;
+            padding: 18px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        /* Voice Control Styles */
+        .voice-control {
+    display: flex;
+    gap: 15px; /* Spacing between buttons */
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.voice-button {
+    width: 70px; /* Adjust size as needed */
+    height: 70px;
+    border-radius: 50%; /* Makes it a perfect circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            color: var(--text-color);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+}
+
+        .voice-button.listening {
+            background: linear-gradient(145deg, #ff4444, #cc0000);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .voice-button i {
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .voice-button.listening i {
+            color: #ff4444;
+        }
+
+        .voice-status {
+            margin-top: 15px;
+            color: black;
+            font-style: italic;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            color: var(--text-color);
+            padding: 18px 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(33, 150, 243, 0.3);
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        textarea {
+    width: 350px; 
+    height: 150px; 
+    min-height: 100px; 
+    max-height: 300px; 
+    resize: vertical;}
+
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Voice-Based Code Generator</h1>
+        <div class="header-icons">
+            <i class="fas fa-users" onclick="showPopup('team')"></i>
+            <i class="fas fa-question-circle" onclick="showPopup('help')"></i>
+        </div>
+    </div>
+
+    <!-- Popups -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="teamPopup">
+        <span class="popup-close" onclick="closePopup('team')">&times;</span>
+        <h2>Our Team</h2>
+        <div class="l-part">
+            <h3>AMULYA S</h3>
+            <a href="https://github.com/amulyaskumar" target="_blank">GitHub Profile</a>
+        </div>
+        <div class="r-part">
+            <h3>SADHANA CK</h3>
+        </div>
+    </div>
+    <div class="popup" id="helpPopup">
+        <span class="popup-close" onclick="closePopup('help')">&times;</span>
+        <h2>Help</h2>
+        <p>Welcome to the Voice-Based Code Generator! This application allows you to write and edit code simply by
+            speaking to it. Our tool uses advanced voice recognition and AI code generation to turn your spoken words
+            into live code. Below is a guide to help you understand how to get started.</p>
+
+        <h3 class="section-title">Key Features of the Application</h3>
+        <ul>
+            <li><strong>Voice Input to Code</strong><br>
+                You can speak commands to the application, and it will generate code for you in real time. For example,
+                saying "Create a Python function" will automatically generate a Python function template.</li>
+            <li><strong>AI-Driven Code Generation</strong><br>
+                Powered by advanced AI, the tool can understand complex coding requests. For example, saying "Write a
+                for loop that prints numbers 1 to 10" will generate the exact code for you.</li>
+            <li><strong>Code Editor with Real-Time Updates</strong><br>
+                The right panel contains a code editor that updates in real-time as you speak. You can also navigate,
+                edit, and update the code using voice commands.</li>
+            <li><strong>Navigation and Editing via Voice</strong><br>
+                You can control the editor by saying commands like "Go to line 5" to navigate or "Replace line 3 with a
+                while loop" to modify the code.</li>
+            <li><strong>Save and Export Code</strong><br>
+                You can save the generated code to your local storage or download it directly as a file.</li>
+        </ul>
+
+        <h3 class="section-title">How to Use the Application</h3>
+        <ol>
+            <li><strong>Step 1: Set Up the Application</strong><br>
+                First, make sure your microphone is working. You'll need it to interact with the application using your
+                voice.</li>
+            <li><strong>Step 2: Start Listening</strong><br>
+                Press the "Start Listening" button. The application will begin transcribing your speech into text in
+                real-time.</li>
+            <li><strong>Step 3: Speak Your Command</strong><br>
+                You can start speaking commands such as <code>"Create a Python function"</code> or
+                <code>"Insert a for loop in JavaScript"</code>. The application will generate code based on your speech.
+            </li>
+            <li><strong>Step 4: Edit the Code</strong><br>
+                You can also use voice commands to modify the code. For example, say <code>"Go to line 10"</code> to
+                move the cursor or <code>"Replace line 5 with a while loop"</code> to update the code.</li>
+            <li><strong>Step 5: Save or Export</strong><br>
+                Once you're done, you can save your code by clicking "Save" or export it as a downloadable file. You can
+                also copy the code to your clipboard to use elsewhere.</li>
+        </ol>
+
+        <h3 class="section-title">Voice Command Examples</h3>
+        <ul>
+            <li><code>"Create a Python function"</code> – This will generate a basic Python function template.</li>
+            <li><code>"Write a for loop in JavaScript"</code> – The application will generate a for loop in JavaScript.
+            </li>
+            <li><code>"Go to line 15"</code> – The cursor will jump to line 15 in the code editor.</li>
+            <li><code>"Replace line 20 with a while loop"</code> – This will replace the code in line 20 with a while
+                loop.</li>
+            <li><code>"Save the file"</code> – This will save your code.</li>
+        </ul>
+
+        <h3 class="section-title">Technical Details</h3>
+        <ul>
+            <li><strong>React</strong> – For building the user interface.</li>
+            <li><strong>React Speech Recognition</strong> – For converting your voice commands into text.</li>
+            <li><strong>GPT-4/Codex AI</strong> – For generating code based on your commands.</li>
+            <li><strong>Monaco Editor</strong> – A powerful, customizable code editor for the right panel.</li>
+            <li><strong>Tailwind CSS</strong> – For styling and layout of the user interface.</li>
+        </ul>
+
+        <h3 class="section-title">Additional Tips</h3>
+        <p class="note">Note: If the application doesn't respond correctly to your voice commands, make sure your
+            microphone is working properly and that you're speaking clearly. You can always manually correct the code in
+            the editor if needed.</p>
+    </div>
+
+
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Part -->
+        <div class="left-part">
+            <div class="input-section">
+                <div class="parameters">
+                    <div>
+                        <label for="language">Programming Language:</label>
+                        <select id="language" onchange="synchronizeLanguages()">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="c">C</option>
+                            <option value="php">PHP</option>
+                            <option value="csharp">C#</option>
+                            <option value="r">R</option>
+                        </select>
+                    </div>
+                                    
+                </div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 2px;">                    
+                    <label for="error_handling" style="margin: 0;"> Error Handling</label>
+                    <input type="checkbox" id="error_handling">    
+                </div>
+                
+                
+                <div class="voice-control">
+                    <button id="startVoice" class="voice-button">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button id="stopVoice" class="voice-button" style="display: none;">
+                        <i class="fas fa-microphone-slash"></i> 
+                    </button>
+                    
+                </div>
+                <br/><br/>
+                <div id="voiceStatus" class="voice-status"></div>
+                <div>
+                    <label for="prompt">Description of the code:</label>
+                    <textarea id="prompt" placeholder=""></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Part -->
+        <div class="right-part">
+            <div class="editor-wrapper">
+                <div class="editor-toolbar">
+                    <button onclick="undo()">Undo</button>
+                    <button onclick="redo()">Redo</button>
+                </div>
+                <textarea id="codeEditor"></textarea>
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <span>Generating code...</span>
+            </div>
+            <div id="response" style="display:none;"></div>
+            <br/><br/>
+            <button onclick="generateCode()" class="generate-button">Generate Code</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/selection/active-line.min.js"></script>
+
+    <script>
+        // Initialize CodeMirror Editor
+        let editor = CodeMirror.fromTextArea(document.getElementById("codeEditor"), {
+            mode: "python",
+            theme: "monokai",
+            lineNumbers: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            styleActiveLine: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false,
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-Z": function (cm) { cm.undo(); },
+                "Ctrl-Y": function (cm) { cm.redo(); },
+                "Ctrl-/": function (cm) { commentSelection(cm); }
+            }
+        });
+
+        // Popup Functions
+        function showPopup(type) {
+            const popup = document.getElementById(`${type}Popup`);
+            const overlay = document.getElementById('overlay');
+            if (popup && overlay) {
+                popup.style.display = 'block';
+                overlay.style.display = 'block';
+            }
+        }
+
+        function closePopup(type) {
+            const popup = document.getElementById(`${type}Popup`);
+            const overlay = document.getElementById('overlay');
+            if (popup && overlay) {
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+            }
+        }
+
+        // Undo and Redo Functions
+        function undo() {
+            editor.undo();
+        }
+
+        function redo() {
+            editor.redo();
+        }
+
+        // Voice Recognition Setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        const startVoiceBtn = document.getElementById('startVoice');
+        const stopVoiceBtn = document.getElementById('stopVoice');
+        const voiceStatus = document.getElementById('voiceStatus');
+        const promptTextarea = document.getElementById('prompt');
+
+        let isListening = false;
+
+        recognition.onstart = () => {
+            isListening = true;
+            voiceStatus.textContent = 'Listening...';
+            startVoiceBtn.style.display = 'none';
+            stopVoiceBtn.style.display = 'inline-block';
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            voiceStatus.textContent = 'Voice input stopped';
+            startVoiceBtn.style.display = 'inline-block';
+            stopVoiceBtn.style.display = 'none';
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('');
+
+            promptTextarea.value = transcript;
+        };
+
+        startVoiceBtn.addEventListener('click', () => {
+            if (!isListening) {
+                recognition.start();
+                startVoiceBtn.classList.add('listening');
+            }
+        });
+
+        stopVoiceBtn.addEventListener('click', () => {
+            if (isListening) {
+                recognition.stop();
+                startVoiceBtn.classList.remove('listening');
+            }
+        });
+
+        // Code Generation Function
+        async function generateCode() {
+            const responseDiv = document.getElementById('response');
+            const loadingDiv = document.getElementById('loading');
+
+            if (!responseDiv || !loadingDiv) {
+                console.error('Required elements not found');
+                return;
+            }
+
+            const params = {
+                language: document.getElementById('language').value,
+                error_handling: document.getElementById('error_handling').checked,
+                prompt: document.getElementById('prompt').value,
+                current_code: editor.getValue()
+            };
+
+            if (!params.prompt) {
+                responseDiv.innerHTML = '<div class="error">Please provide a description of the code you want to generate.</div>';
+                return;
+            }
+
+            try {
+                loadingDiv.style.display = 'block';
+                responseDiv.innerHTML = '';
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.status === 'success') {
+                        responseDiv.innerHTML = data.response;
+                        if (data.raw_response) {
+                            const codeMatch = data.raw_response.match(/```[\w]*\n([\s\S]*?)```/);
+                            if (codeMatch && codeMatch[1]) {
+                                editor.setValue(codeMatch[1].trim());
+                            }
+                        }
+                    } else {
+                        throw new Error(data.error || 'Unknown error occurred');
+                    }
+                } else {
+                    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    responseDiv.innerHTML = `
+                        <div class="error">
+                            Request timed out. The server is taking too long to respond. 
+                            Please try again or check your internet connection.
+                        </div>`;
+                } else {
+                    responseDiv.innerHTML = `
+                        <div class="error">
+                            Error: ${error.message}
+                            <br><br>
+                            Please try again later or contact support if the problem persists.
+                        </div>`;
+                }
+            } finally {
+                if (loadingDiv) {
+                    loadingDiv.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
