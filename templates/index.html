@@ -8,30 +8,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+   
     <style>
         /* General Styles */
         :root {
-            --primary-color: #9a7bff;
-            --secondary-color: #7c5cf7;
+            --primary-color: #6A4C9C;
+            --primary-dark: #553C9A;
+            --secondary-color: #9F7AEA;
+            --accent-color: #B794F4;
+            --text-light: #E9D8FD;
+            --white: #ffffff;
+            --shadow: rgba(106, 76, 156, 0.2);
             --background-color: #f0e6ff;
             --text-color: #333;
-            --accent-color: #e6d4f7;
-            --soft-purple: #d1c1f0;
-            --light-purple: #e8e0ff;
         }
 
         body {
-            font-family: 'Inter', Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
-            color: var(--text-color);
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-color));
+            color: var(--white);
         }
 
         /* Header Styles */
         .header {
             background: transparent;
-            color: #7765bf;
+            color: var(--text-light);
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
@@ -67,8 +70,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(360deg, var(--background-color) 0%, var(--accent-color) 100%);
-            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: var(--white);
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -79,37 +83,33 @@
             overflow-y: auto;
         }
 
-        /* Styling for headings inside the popup */
         .popup h2 {
             margin-top: 0;
-            color: #7765bf;
+            color: var(--text-light);
             font-size: 22px;
             text-align: center;
         }
 
-        /* Styling for popup content */
         .popup p {
-            color: #333;
+            color: var(--white);
             font-size: 16px;
             line-height: 1.6;
         }
 
-        /* Close button adjustments */
         .popup-close {
             position: absolute;
             top: 15px;
             right: 15px;
             cursor: pointer;
             font-size: 22px;
-            color: #666;
+            color: var(--text-light);
             transition: color 0.3s ease;
         }
 
         .popup-close:hover {
-            color: #000;
+            color: var(--white);
         }
 
-        /* Overlay to blur background when popup is open */
         .overlay {
             display: none;
             position: fixed;
@@ -122,7 +122,6 @@
             z-index: 999;
         }
 
-        /* Improve list styling inside popup */
         .popup ul {
             padding-left: 20px;
             margin-top: 10px;
@@ -130,10 +129,9 @@
 
         .popup ul li {
             font-size: 16px;
-            color: #444;
+            color: var(--text-light);
             margin-bottom: 8px;
         }
-
 
         /* Container Styles */
         .container {
@@ -154,12 +152,11 @@
 
         /* Input Section Styles */
         .input-section {
-            background: transparent;
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 123, 255, 0.15);
-            height: fit-content;
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             position: sticky;
             top: 20px;
@@ -167,41 +164,35 @@
             overflow-y: auto;
         }
 
-        .parameters {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
         textarea,
         select,
         input {
             width: 100%;
             padding: 14px;
-            border: 3px solid #f1f3f4;
+            border: 3px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             transition: all 0.3s ease;
             font-size: 14px;
             background: transparent;
+            color: var(--white);
         }
 
         textarea:focus,
         select:focus,
         input:focus {
-            border-color: #2196f3;
+            border-color: var(--accent-color);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.15);
+            box-shadow: 0 0 0 4px rgba(183, 148, 244, 0.15);
         }
 
         textarea {
-            min-height: 90px;
-            line-height: 1.6;
+            min-height: 40px;
+            line-height: 1.4;
         }
 
         button {
-            background: #7765bf;
-            color: white;
+            background: var(--accent-color);
+            color: var(--white);
             border: none;
             padding: 14px 28px;
             border-radius: 12px;
@@ -211,20 +202,29 @@
             text-transform: uppercase;
             letter-spacing: 0.7px;
         }
+
+        button:hover {
+            background: var(--secondary-color);
+        }
+
         /* Editor Styles */
         .editor-wrapper {
-            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 15px 30px rgba(220, 222, 224, 0.1);
-            height: calc(100vh - 200px);
-            backdrop-filter: blur(10px);
+            height: calc(100vh - 250px);
+            min-height: 510px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
         }
 
         .editor-toolbar {
-            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            background: rgba(57, 39, 39, 0.1);
             padding: 15px;
-            border-bottom: 1px solid rgba(33, 150, 243, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .CodeMirror {
@@ -233,13 +233,54 @@
             font-size: 14px;
             line-height: 1.7;
             padding: 20px;
-            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
+            background: #1e1e1e !important;  /* Dark background */
+            color: #d4d4d4;  /* Light gray text */
+        }
+
+        /* Style the editor gutter (line numbers area) */
+        .CodeMirror-gutters {
+            background: #262626 !important;  /* Slightly lighter than main background */
+            border-right: 1px solid #404040;
+        }
+
+        .CodeMirror-linenumber {
+            color: #858585 !important;  /* Muted gray for line numbers */
+        }
+
+        /* Style the active line */
+        .CodeMirror-activeline-background {
+            background: #2c2c2c !important;  /* Slightly lighter than background */
+        }
+
+        /* Style selection */
+        .CodeMirror-selected {
+            background: #264f78 !important;  /* Blue-ish selection color */
+        }
+
+        .CodeMirror-focused .CodeMirror-selected {
+            background: #264f78 !important;
+        }
+
+        /* Custom scrollbar for CodeMirror */
+        .CodeMirror-scrollbar-filler {
+            background: transparent;
+        }
+
+        .CodeMirror-simplescroll-vertical {
+            width: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .CodeMirror-simplescroll-vertical div {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
         }
 
         /* Loading and Error Styles */
         .loading {
-            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
-            color: #7765bf;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
             padding: 18px;
             border-radius: 12px;
             text-align: center;
@@ -255,7 +296,7 @@
             content: '';
             width: 20px;
             height: 20px;
-            border: 3px solid #7765bf;
+            border: 3px solid var(--text-light);
             border-top-color: transparent;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -268,9 +309,9 @@
         }
 
         .error {
-            background: linear-gradient(to right, #ffebee, #ffcdd2);
+            background: rgba(255, 235, 238, 0.1);
             border: 1px solid rgba(198, 40, 40, 0.2);
-            color: #c62828;
+            color: #ff4444;
             padding: 18px;
             border-radius: 12px;
             margin: 20px 0;
@@ -279,28 +320,28 @@
 
         /* Voice Control Styles */
         .voice-control {
-    display: flex;
-    gap: 15px; /* Spacing between buttons */
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
 
-.voice-button {
-    width: 70px; /* Adjust size as needed */
-    height: 70px;
-    border-radius: 50%; /* Makes it a perfect circle */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
-            color: var(--text-color);
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 20px;
-    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
-}
+        .voice-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-color);
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        }
 
         .voice-button.listening {
             background: linear-gradient(145deg, #ff4444, #cc0000);
@@ -332,7 +373,7 @@
 
         .voice-status {
             margin-top: 15px;
-            color: black;
+            color: var(--text-light);
             font-style: italic;
             font-size: 14px;
             text-align: center;
@@ -343,8 +384,8 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: linear-gradient(135deg, var(--background-color) 0%, var(--accent-color) 100%);
-            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
             padding: 18px 35px;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(33, 150, 243, 0.3);
@@ -354,12 +395,12 @@
         }
 
         textarea {
-    width: 350px; 
-    height: 150px; 
-    min-height: 100px; 
-    max-height: 300px; 
-    resize: vertical;}
-
+            width: 350px;
+            height: 40px;
+            min-height: 100px;
+            max-height: 300px;
+            resize: vertical;
+        }
 
         @keyframes slideIn {
             from {
@@ -373,6 +414,181 @@
             }
         }
 
+        /* Add to your existing styles */
+        .features-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .features-info h3 {
+            margin-top: 0;
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .features-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features-info li {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .features-info li i {
+            margin-right: 8px;
+            color: var(--accent-color);
+        }
+
+        .features-info span {
+            display: block;
+            margin-left: 25px;
+            color: #B794F4;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        /* Updated editor controls layout */
+        .editor-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: rgba(106, 76, 156, 0.3);  /* Match with app background */
+            border-radius: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .language-select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .error-handling {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            color: var(--white);
+        }
+
+        .editor-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Update select styling */
+        .language-select select {
+            background: rgba(106, 76, 156, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--white) !important;
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 32px;
+            position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 8px center !important;
+            background-size: 16px !important;
+        }
+
+        .language-select {
+            position: relative;
+        }
+
+        .language-select select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(136, 107, 185, 0.2);
+        }
+
+        /* Hide default arrow in IE */
+        .language-select select::-ms-expand {
+            display: none;
+        }
+
+        .error-handling input[type="checkbox"] {
+            accent-color: var(--accent-color);
+        }
+
+        /* Update buttons in editor controls */
+        .editor-buttons button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .editor-buttons button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Update team popup styles */
+        .team-grid {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 30px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+        }
+
+        .team-member img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .team-member-info {
+            flex: 1;
+        }
+
+        .team-member h3 {
+            margin: 0 0 8px 0;
+            color: var(--white);
+            font-size: 18px;
+        }
+
+        .team-member a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .team-member a:hover {
+            color: var(--white);
+        }
     </style>
 </head>
 
@@ -391,12 +607,25 @@
     <div class="popup" id="teamPopup">
         <span class="popup-close" onclick="closePopup('team')">&times;</span>
         <h2>Our Team</h2>
-        <div class="l-part">
-            <h3>AMULYA S</h3>
-            <a href="https://github.com/amulyaskumar" target="_blank">GitHub Profile</a>
-        </div>
-        <div class="r-part">
-            <h3>SADHANA CK</h3>
+        <div class="team-grid">
+            <div class="team-member">
+                <img src="https://avatars.dicebear.com/api/avataaars/amulya.svg" alt="Avatar">
+                <div class="team-member-info">
+                    <h3>AMULYA S</h3>
+                    <a href="https://github.com/amulyaskumar" target="_blank">
+                        <i class="fab fa-github"></i> GitHub Profile
+                    </a>
+                </div>
+            </div>
+            <div class="team-member">
+                <img src="https://avatars.dicebear.com/api/avataaars/sadhana.svg" alt="Avatar">
+                <div class="team-member-info">
+                    <h3>SADHANA CK</h3>
+                    <a href="#" target="_blank">
+                        <i class="fab fa-github"></i> GitHub Profile
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
     <div class="popup" id="helpPopup">
@@ -404,7 +633,7 @@
         <h2>Help</h2>
         <p>Welcome to the Voice-Based Code Generator! This application allows you to write and edit code simply by
             speaking to it. Our tool uses advanced voice recognition and AI code generation to turn your spoken words
-            into live code. Below is a guide to help you understand how to get started.</p>
+            into live code.</p>
 
         <h3 class="section-title">Key Features of the Application</h3>
         <ul>
@@ -414,14 +643,9 @@
             <li><strong>AI-Driven Code Generation</strong><br>
                 Powered by advanced AI, the tool can understand complex coding requests. For example, saying "Write a
                 for loop that prints numbers 1 to 10" will generate the exact code for you.</li>
-            <li><strong>Code Editor with Real-Time Updates</strong><br>
-                The right panel contains a code editor that updates in real-time as you speak. You can also navigate,
-                edit, and update the code using voice commands.</li>
             <li><strong>Navigation and Editing via Voice</strong><br>
                 You can control the editor by saying commands like "Go to line 5" to navigate or "Replace line 3 with a
                 while loop" to modify the code.</li>
-            <li><strong>Save and Export Code</strong><br>
-                You can save the generated code to your local storage or download it directly as a file.</li>
         </ul>
 
         <h3 class="section-title">How to Use the Application</h3>
@@ -439,9 +663,6 @@
             <li><strong>Step 4: Edit the Code</strong><br>
                 You can also use voice commands to modify the code. For example, say <code>"Go to line 10"</code> to
                 move the cursor or <code>"Replace line 5 with a while loop"</code> to update the code.</li>
-            <li><strong>Step 5: Save or Export</strong><br>
-                Once you're done, you can save your code by clicking "Save" or export it as a downloadable file. You can
-                also copy the code to your clipboard to use elsewhere.</li>
         </ol>
 
         <h3 class="section-title">Voice Command Examples</h3>
@@ -452,22 +673,8 @@
             <li><code>"Go to line 15"</code> – The cursor will jump to line 15 in the code editor.</li>
             <li><code>"Replace line 20 with a while loop"</code> – This will replace the code in line 20 with a while
                 loop.</li>
-            <li><code>"Save the file"</code> – This will save your code.</li>
         </ul>
 
-        <h3 class="section-title">Technical Details</h3>
-        <ul>
-            <li><strong>React</strong> – For building the user interface.</li>
-            <li><strong>React Speech Recognition</strong> – For converting your voice commands into text.</li>
-            <li><strong>GPT-4/Codex AI</strong> – For generating code based on your commands.</li>
-            <li><strong>Monaco Editor</strong> – A powerful, customizable code editor for the right panel.</li>
-            <li><strong>Tailwind CSS</strong> – For styling and layout of the user interface.</li>
-        </ul>
-
-        <h3 class="section-title">Additional Tips</h3>
-        <p class="note">Note: If the application doesn't respond correctly to your voice commands, make sure your
-            microphone is working properly and that you're speaking clearly. You can always manually correct the code in
-            the editor if needed.</p>
     </div>
 
 
@@ -476,30 +683,22 @@
     <div class="container">
         <!-- Left Part -->
         <div class="left-part">
-            <div class="input-section">
-                <div class="parameters">
-                    <div>
-                        <label for="language">Programming Language:</label>
-                        <select id="language" onchange="synchronizeLanguages()">
-                            <option value="python">Python</option>
-                            <option value="javascript">JavaScript</option>
-                            <option value="java">Java</option>
-                            <option value="cpp">C++</option>
-                            <option value="typescript">TypeScript</option>
-                            <option value="c">C</option>
-                            <option value="php">PHP</option>
-                            <option value="csharp">C#</option>
-                            <option value="r">R</option>
-                        </select>
-                    </div>
-                                    
+            <div class="input-section">              
+                <div class="features-info">
+                    <h3>Voice Commands:</h3>
+                    <ul>
+                        <li><i class="fas fa-terminal"></i> Code Generation:
+                            <span>"Generate a function to sort an array"</span>
+                        </li>
+                        <li><i class="fas fa-arrows-alt"></i> Navigation:
+                            <span>"Go to line 5"</span>
+                        </li>
+                        <li><i class="fas fa-exchange-alt"></i> Text Replacement:
+                            <span>"Change hello to world"</span>
+                            <span>"Go to line 3 and change any to all"</span>
+                        </li>
+                    </ul>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 2px;">                    
-                    <label for="error_handling" style="margin: 0;"> Error Handling</label>
-                    <input type="checkbox" id="error_handling">    
-                </div>
-                
-                
                 <div class="voice-control">
                     <button id="startVoice" class="voice-button">
                         <i class="fas fa-microphone"></i>
@@ -521,9 +720,28 @@
         <!-- Right Part -->
         <div class="right-part">
             <div class="editor-wrapper">
-                <div class="editor-toolbar">
-                    <button onclick="undo()">Undo</button>
-                    <button onclick="redo()">Redo</button>
+                <div class="editor-controls">
+                    <div class="language-select">
+                        <select id="language" onchange="synchronizeLanguages()">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="c">C</option>
+                            <option value="php">PHP</option>
+                            <option value="csharp">C#</option>
+                            <option value="r">R</option>
+                        </select>
+                    </div>
+                    <div class="error-handling">
+                        <input type="checkbox" id="error_handling">
+                        <label for="error_handling">Error Handling</label>
+                    </div>
+                    <div class="editor-buttons">
+                        <button onclick="undo()">Undo</button>
+                        <button onclick="redo()">Redo</button>
+                    </div>
                 </div>
                 <textarea id="codeEditor"></textarea>
             </div>
@@ -598,15 +816,16 @@
         // Voice Recognition Setup
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
+        recognition.continuous = false;  // Changed to false to get complete phrases
+        recognition.interimResults = false;  // Changed to false to get final results only
+        recognition.lang = 'en-US';  // Set language explicitly
+
+        let isListening = false;
 
         const startVoiceBtn = document.getElementById('startVoice');
         const stopVoiceBtn = document.getElementById('stopVoice');
         const voiceStatus = document.getElementById('voiceStatus');
         const promptTextarea = document.getElementById('prompt');
-
-        let isListening = false;
 
         recognition.onstart = () => {
             isListening = true;
@@ -623,18 +842,80 @@
         };
 
         recognition.onresult = (event) => {
-            const transcript = Array.from(event.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
-                .join('');
-
-            promptTextarea.value = transcript;
+            const transcript = event.results[0][0].transcript;
+            const commandLower = transcript.toLowerCase();
+            
+            // Show what was heard
+            voiceStatus.textContent = `Command: ${transcript}`;
+            
+            // Handle line navigation and text replacement
+            if (commandLower.includes('go to line')) {
+                const lineNumber = parseInt(commandLower.match(/line\s+(\d+)/)?.[1]);
+                if (lineNumber) {
+                    editor.setCursor(lineNumber - 1, 0);
+                    if (commandLower.includes('change') || commandLower.includes('replace')) {
+                        handleLineChange(commandLower, lineNumber - 1);
+                    }
+                    showNotification(`Moved to line ${lineNumber}`);
+                }
+            }
+            // Handle global text replacement
+            else if (commandLower.includes('change') || commandLower.includes('replace')) {
+                handleGlobalChange(commandLower);
+            }
+            else {
+                // For code generation, store in prompt textarea
+                promptTextarea.value = transcript;
+            }
         };
+
+        // Add these new functions to handle text changes
+        function handleLineChange(command, lineNumber) {
+            // Extract "change X to Y" pattern
+            const match = command.match(/change\s+(.+?)\s+to\s+(.+)$/i);
+            if (match) {
+                const [_, fromWord, toWord] = match;
+                const lines = editor.getValue().split('\n');
+                if (lineNumber >= 0 && lineNumber < lines.length) {
+                    const oldLine = lines[lineNumber];
+                    lines[lineNumber] = oldLine.replace(new RegExp(fromWord, 'gi'), toWord);
+                    editor.setValue(lines.join('\n'));
+                    editor.setCursor(lineNumber, 0);
+                    showNotification(`Changed "${fromWord}" to "${toWord}" in line ${lineNumber + 1}`);
+                }
+            }
+        }
+
+        function handleGlobalChange(command) {
+            // Extract "change X to Y" pattern
+            const match = command.match(/(?:change|replace)\s+(.+?)\s+to\s+(.+)$/i);
+            if (match) {
+                const [_, fromWord, toWord] = match;
+                const content = editor.getValue();
+                const newContent = content.replace(new RegExp(fromWord, 'gi'), toWord);
+                editor.setValue(newContent);
+                showNotification(`Changed all occurrences of "${fromWord}" to "${toWord}"`);
+            }
+        }
+
+        // Add notification function if not already present
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
 
         startVoiceBtn.addEventListener('click', () => {
             if (!isListening) {
                 recognition.start();
                 startVoiceBtn.classList.add('listening');
+                voiceStatus.textContent = 'Listening...';
             }
         });
 
@@ -642,6 +923,7 @@
             if (isListening) {
                 recognition.stop();
                 startVoiceBtn.classList.remove('listening');
+                voiceStatus.textContent = 'Voice input stopped';
             }
         });
 
@@ -658,7 +940,7 @@
             const params = {
                 language: document.getElementById('language').value,
                 error_handling: document.getElementById('error_handling').checked,
-                prompt: document.getElementById('prompt').value,
+                prompt: document.getElementById('prompt').value + " (generate without comments)",
                 current_code: editor.getValue()
             };
 

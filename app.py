@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 import time
 from requests.exceptions import RequestException
-
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
